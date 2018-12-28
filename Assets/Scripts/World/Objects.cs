@@ -68,7 +68,7 @@ namespace Industry.World
             GameObjects = this;
             WorldMap.Initialize();
             
-            StartCoroutine(RouteSetWP.CheckRoutes());
+            StartCoroutine(RouteSet.CheckRoutes());
         }
 
         void Update()
@@ -83,9 +83,9 @@ namespace Industry.World
         {
             while (true)
             {
-                RouteSetWP.HighLightAll(false);
+                RouteSet.HighLightAll(false);
                 GizmosDrawer.Clear();
-                RouteSetWP.HighLightAll(true);
+                RouteSet.HighLightAll(true);
 
                 yield return new WaitForSeconds(2);
             }

@@ -7,6 +7,7 @@ using Industry.World.Roads;
 using Industry.Utilities;
 using System.Linq;
 using Industry.World;
+using System;
 
 namespace Industry.AI.Routing
 {
@@ -99,6 +100,94 @@ namespace Industry.AI.Routing
             }
         }
 
+        private static List<Road> BFS(Road from, Road to)
+        {
+            Queue<Road> queue = new Queue<Road>();
+            HashSet<Road> explored = new HashSet<Road>();
+            Dictionary<Road, Road> parents = new Dictionary<Road, Road>();
+
+            queue.Enqueue(from);
+
+            while (queue.Count > 0)
+            {
+                Road current = queue.Dequeue();
+                if (current == to) break;
+
+                RoadArray links = GetLinks(current);
+
+                for (int i = 0; i < links.Length; i++)
+                {
+                    Road link = links[i];
+                    if (!explored.Contains(link))
+                    {
+                        explored.Add(link);
+                        parents.Add(link, current);
+                        queue.Enqueue(link);
+                    }
+                }
+
+                if (queue.Count == 0) return null;
+            }
+
+            List<Road> path = new List<Road>();
+
+            Road curr = to;
+
+            try
+            {
+                while (curr != from)
+                {
+                    path.Add(curr);
+                    curr = parents[curr];
+                }
+
+                path.Add(from);
+                path.Reverse(); // ?
+
+                return path;
+            }
+            catch (KeyNotFoundException)
+            {
+                return null;
+            }
+        }
+
+        private static RoadArray GetLinks(Road current)
+        {
+            RoadArray array = new RoadArray(4);
+
+            if (current.north != null)
+                array.Add(current.north);
+            if (current.south != null)
+                array.Add(current.south);
+            if (current.east != null)
+                array.Add(current.east);
+            if (current.west != null)
+                array.Add(current.west);
+
+            return array;
+        }
+
+        public static List<Road> CreatePathRoads(Road from, Road to)
+        {
+            if (from == null || to == null) return null;
+            Timer timer = new Timer();
+            if (Logging) timer.Start();
+
+            List<Road> shortestPath = BFS(from, to);
+
+            if (Logging)
+            {
+                double time = timer.ElapsedTime(Timer.Units.Milliseconds);
+                if (shortestPath != null)
+                    Debug.Log("<color=green>Pathfinding:</color> Path length: " + shortestPath.Count + ". Elapsed time: " + time + " ms.");
+                else
+                    Debug.Log("<color=red>Pathfinding:</color> Path doesn't exist. Elapsed time: " + time + " ms.");
+            }
+
+            return shortestPath;
+        }
+
         /// <summary>
         /// Возвращает последовательность <typeparamref name="WayPoint"/>'ов, являющейся кратчайшим путём 
         /// от конца дороги [<typeparamref name="Road"/>] <paramref name="from"/> 
@@ -147,8 +236,8 @@ namespace Industry.AI.Routing
         /// <returns>Возвращает список 'ов, если путь существует и <typeparamref name="null"/> - если путь не существует.</returns>
         public static List<WayPoint> CreatePathWP(Vector3 from, Vector3 to, bool back = true)
         {
-            Object ownerFrom = WorldMap.GetTile(from).Owner;
-            Object ownerTo = WorldMap.GetTile(to).Owner;
+            UnityEngine.Object ownerFrom = WorldMap.GetTile(from).Owner;
+            UnityEngine.Object ownerTo = WorldMap.GetTile(to).Owner;
 
             Road rFrom = ownerFrom.GetType() == typeof(Road) ? ownerFrom as Road : ownerFrom.GetType().IsSubclassOf(typeof(EntranceBuilding)) ? (ownerFrom as EntranceBuilding).entrance : null;
             Road rTo = ownerTo.GetType() == typeof(Road) ? ownerTo as Road : ownerTo.GetType().IsSubclassOf(typeof(EntranceBuilding)) ? (ownerTo as EntranceBuilding).entrance : null;

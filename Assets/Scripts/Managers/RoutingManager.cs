@@ -13,7 +13,7 @@ namespace Industry.Managers
     {
         private static Road from;
         private static Road to;
-        private static RouteWP last_route;
+        private static Route last_route;
         
         public static bool Enabled
         {
@@ -28,7 +28,7 @@ namespace Industry.Managers
             {
                 last_route.HighLight(false);
                 
-                RouteSetWP.AddRoute(last_route);
+                RouteSet.AddRoute(last_route);
 
                 last_route = null;
             }
@@ -44,7 +44,7 @@ namespace Industry.Managers
 
             if (roads != null)
             {
-                last_route = new RouteWP(roads);
+                last_route = new Route(roads);
                 last_route.HighLight(true);
             }
         }

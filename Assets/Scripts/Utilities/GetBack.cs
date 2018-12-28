@@ -8,16 +8,20 @@ namespace Industry.Utilities
 {
     public static class GetBack
     {
-        public static List<Road> getWayToClosest(Road currentRoad, List<Road> mainRoad)
+        public static List<Road> GetWayToClosest(Road currentRoad, List<Road> mainRoad)
         {
             HashSet<RoadNode> roadToCheck = new HashSet<RoadNode>();
+
             List<Road> path = new List<Road>();
             path.Add(currentRoad);
+
             RoadNode currRoad = new RoadNode(currentRoad, path);
-            return loop(roadToCheck, null, mainRoad, null);
+            roadToCheck.Add(currRoad);
+
+            return Loop(roadToCheck, new HashSet<Road>(), mainRoad, new HashSet<List<Road>>());
         }
 
-        private static List<Road> loop(HashSet<RoadNode> checkingRoads, HashSet<Road> checkedRoads, List<Road> mainRoad, HashSet<List<Road>> paths)
+        private static List<Road> Loop(HashSet<RoadNode> checkingRoads, HashSet<Road> checkedRoads, List<Road> mainRoad, HashSet<List<Road>> paths)
         {
             HashSet<RoadNode> newCheckingRoads = new HashSet<RoadNode>();
             foreach(RoadNode currentRoad in checkingRoads)
@@ -100,7 +104,7 @@ namespace Industry.Utilities
             }
             else
             {
-                return loop(newCheckingRoads, checkedRoads, mainRoad, paths);
+                return Loop(newCheckingRoads, checkedRoads, mainRoad, paths);
             }
         }
     }

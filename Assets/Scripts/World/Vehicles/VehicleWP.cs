@@ -18,7 +18,7 @@ namespace Industry.World.Vehicles
 
         private int current_WP;
 
-        private RouteWP route, temp;
+        private Route route, temp;
         private RouteSphere sphereCurr;
         private Vector3 lastSuccessfulPos;
         private Vector3 v_height;
@@ -45,6 +45,9 @@ namespace Industry.World.Vehicles
         public GameObject sphere;
         public Vector3 trRight;
 
+        private List<Road> mainRoad;
+        private List<Road> tempRoad;
+
         void Start()
         {
             if (route == null) { Abort("Route is null"); return; }
@@ -68,7 +71,7 @@ namespace Industry.World.Vehicles
             lastSuccessfulRot = transform.rotation;
 
             vehicleCount++;
-
+            
             _Start();
         }
         void Update()
@@ -126,20 +129,32 @@ namespace Industry.World.Vehicles
             if (newTemp == null) { Abort("Path does not exist"); return; }
 
             if (temp != null)
-                RouteSetWP.RemoveRoute(temp);
-
-            temp = new RouteWP(newTemp, true);
-            RouteSetWP.AddRoute(temp, false);
+                RouteSet.RemoveRoute(temp);
+            
+            temp = new Route(newTemp, true);
+            RouteSet.AddRoute(temp, false);
             
             on_main_route = false;
             current_WP = 0;
             
             sphereCurr.SetPosition(current.Position);
+
+
+            Road curr = ExtractRoadFrom(WorldMap.GetTile(Position));
+
+            tempRoad = GetBack.GetWayToClosest(curr, mainRoad);
+
+            for (int i = 0; i < tempRoad.Count; i++)
+            {
+                tempRoad[i].SetColor(RoadColor.Red);
+            }
+
+            //enabled = false;
         }
         
         private void Move()
         {
-            RouteWP _route = on_main_route ? route : temp;
+            Route _route = on_main_route ? route : temp;
 
             if (current_WP < 0 || current_WP >= _route.Count)
                 throw new System.ArgumentOutOfRangeException(current_WP.ToString());
@@ -178,7 +193,7 @@ namespace Industry.World.Vehicles
                     //if (route.Contains(curr)) { }
                     on_main_route = true;
 
-                    RouteSetWP.RemoveRoute(temp);
+                    RouteSet.RemoveRoute(temp);
 
                     temp.HighLight(false);
                     temp = null;
@@ -253,7 +268,7 @@ namespace Industry.World.Vehicles
             can_move = false;
             Debug.Log("<color=red> Aborted:</color> Vehicle \"" + name + "\": " + reason + "!");
         }
-        public void SetRoute(RouteWP _route)
+        public void SetRoute(Route _route)
         {
             if (_route == null)
                 throw new System.NullReferenceException("route is null");
@@ -261,6 +276,11 @@ namespace Industry.World.Vehicles
             if (this.route == null)
             {
                 this.route = _route;
+                mainRoad = RouteCreator.CreatePathRoads(ExtractRoadFrom(WorldMap.GetTile(_route.startPoint)), ExtractRoadFrom(WorldMap.GetTile(_route.endPoint)));
+                for (int i = 0; i < mainRoad.Count; i++)
+                {
+                    mainRoad[i].SetColor(RoadColor.Transparent);
+                }
             }
             else
             {
@@ -273,7 +293,11 @@ namespace Industry.World.Vehicles
                     FindWayToRoute();
                 sphereCurr.SetPosition(current.Position);
 
-
+                mainRoad = RouteCreator.CreatePathRoads(ExtractRoadFrom(WorldMap.GetTile(_route.startPoint)), ExtractRoadFrom(WorldMap.GetTile(_route.endPoint)));
+                for (int i = 0; i < mainRoad.Count; i++)
+                {
+                    mainRoad[i].SetColor(RoadColor.Transparent);
+                }
                 //this.route.HighLight(true);
             }
 

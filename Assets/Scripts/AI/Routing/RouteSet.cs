@@ -9,9 +9,9 @@ using Industry.Utilities;
 
 namespace Industry.AI.Routing
 {
-    public static class RouteSetWP
+    public static class RouteSet
     {
-        private static List<RouteWP> routes = new List<RouteWP>(16);
+        private static List<Route> routes = new List<Route>(16);
 
         public static bool checking = true;
         public static int Count
@@ -50,7 +50,7 @@ namespace Industry.AI.Routing
         //    }
         //}
 
-        public static void AddRoute(RouteWP route, bool createTruck = true)
+        public static void AddRoute(Route route, bool createTruck = true)
         {
             if (createTruck)
             {
@@ -74,7 +74,7 @@ namespace Industry.AI.Routing
                 for (int i = 0; i < Count; i++)
                 {
 
-                    RouteWP routesI = routes[i];
+                    Route routesI = routes[i];
                     routesI.HighLight(false);
 
                     Debug.Log("Recalculation: Route " + routesI.RouteID + ", temp - " + routesI.IsTemp);
@@ -91,7 +91,7 @@ namespace Industry.AI.Routing
                 for (int i = 0; i < Count; i++)
                 {
 
-                    RouteWP routesI = routes[i];
+                    Route routesI = routes[i];
                     
                     if (routesI.Contains(changed))
                     {
@@ -124,7 +124,7 @@ namespace Industry.AI.Routing
             }
         }
         
-        public static void RemoveRoute(RouteWP route)
+        public static void RemoveRoute(Route route)
         {
             Object.Destroy(route.s1);
             Object.Destroy(route.s2);
@@ -155,7 +155,7 @@ namespace Industry.AI.Routing
                     
                     for (int i = 0; i < routes.Count; i++)
                     {
-                        RouteWP route = routes[i];
+                        Route route = routes[i];
 
                         int curr = 0, last = route.Count - 1;
 

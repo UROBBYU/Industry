@@ -9,11 +9,11 @@ using Industry.Utilities;
 
 namespace Industry.AI.Routing
 {
-    public class RouteWP
+    public class Route
     {
         private static int lastID = 0;
         
-        public RouteWP(Road fromEnd, Road toEnd, bool is_temp = false)
+        public Route(Road fromEnd, Road toEnd, bool is_temp = false)
         {
             if (fromEnd == null || toEnd == null)
                 throw new ArgumentNullException("from/to");
@@ -23,7 +23,7 @@ namespace Industry.AI.Routing
 
             _Init(RouteCreator.CreatePathWP(fromEnd, toEnd, true), is_temp);
         }
-        public RouteWP(List<WayPoint> wp_sequence, bool is_temp = false)
+        public Route(List<WayPoint> wp_sequence, bool is_temp = false)
         {
             if (wp_sequence == null)
                 throw new ArgumentNullException("WP_Sequence is null.");
@@ -161,7 +161,7 @@ namespace Industry.AI.Routing
                 foreach (var veh in vehicles)
                     veh.SetRoute(this);
         }
-        public void SetRouteToAllVehicles(RouteWP route)
+        public void SetRouteToAllVehicles(Route route)
         {
             foreach (var veh in vehicles)
             {
